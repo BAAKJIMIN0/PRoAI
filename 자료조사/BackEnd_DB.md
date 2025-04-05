@@ -1,6 +1,7 @@
-<h2>PRo-AI</h2>
+# PRo-AI
+BackEnd 관련 자료
 
-## AI
+## AI 관련
  GPT 모델을 호출할 수 있는 API를 운용해야 할 것 같음 .
 (GPT가 죽으면 작동을 안한다는 단점) 
 1. OpenAI API키 발급
