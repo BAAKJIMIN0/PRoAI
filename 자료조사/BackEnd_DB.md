@@ -14,8 +14,7 @@ ex) Ollama
 
 
 간단한 예제(Ollama)
-
-# server.js
+// server.js
 
 const express = require('express');
 const axios = require('axios');
