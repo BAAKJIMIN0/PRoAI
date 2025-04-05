@@ -38,7 +38,7 @@ app.post('/chat', async (req, res) => {
       stream: false,
     });
 
-    res.json({ reply: response.data.response });
+   res.json({ reply: response.data.response });
   } catch (err) {
     console.error(err);
     res.status(500).json({ reply: 'Error contacting Ollama' });
