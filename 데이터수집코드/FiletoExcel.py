@@ -3,10 +3,28 @@ from pathlib import Path
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 
-def extract_from_docx(file_path):
+def extract_docx_table_data(file_path):
     from docx import Document
     doc = Document(file_path)
-    return [para.text.strip() for para in doc.paragraphs if para.text.strip()]
+
+    data = []
+
+    for table in doc.tables:
+        for row in table.rows:
+            cells = row.cells
+            if len(cells) >= 2:
+                key = cells[0].text.strip()
+                value = cells[1].text.strip()
+                if key and value:
+                    data.append((key, value))
+    return data
+
+def save_structured_docx_to_excel(file_path):
+    data = extract_docx_table_data(file_path)
+    df = pd.DataFrame(data, columns=["항목", "내용"])
+    output_path = Path(file_path).with_suffix(".xlsx")
+    df.to_excel(output_path, index=False)
+    print(f"[✔] 엑셀 저장 완료: {output_path}")
 
 def extract_from_pptx(file_path):
     from pptx import Presentation
@@ -34,7 +52,8 @@ def save_to_excel(data, output_path):
 def process_file(file_path):
     ext = Path(file_path).suffix.lower()
     if ext == ".docx":
-        data = extract_from_docx(file_path)
+        save_structured_docx_to_excel(file_path)
+        return
     elif ext == ".pptx":
         data = extract_from_pptx(file_path)
     elif ext == ".hwp":
@@ -43,8 +62,7 @@ def process_file(file_path):
         print(f"[!] 지원하지 않는 파일 형식: {ext}")
         return
 
-    output_excel = Path(file_path).with_suffix(".xlsx")
-    save_to_excel(data, output_excel)
+    save_to_excel(data, Path(file_path).with_suffix(".xlsx"))
 
 # ▶ 팝업으로 파일 선택하기
 def run_gui_file_select():
