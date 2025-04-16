@@ -73,7 +73,13 @@ def save_structured_docx_to_excel(file_path):
     df.to_excel(output_path, index=False)
     print(f"[✔] 엑셀 저장 완료: {output_path}")
 ```
-이전 함수에서 반환받은 리스트를 엑셀형식에 맞춰서 저장해야하기에 Pandas의 DataFrame을 사용하여 형식을 맞춘 후 저장한다.
+이전 함수에서 반환받은 리스트를 엑셀형식에 맞춰서 저장해야하기에 Pandas의 DataFrame을 사용하여 형식을 맞춘 후 저장한다.<br>
+<h2>엑셀파일 저장결과</h2>
+
+![엑셀파일예시](./images/ExcelExample.png)
+위 코드를 통해 엑셀파일에 저장하면 결과물은 사진과 같다.<br>
+이는 단순히 데이터 전체를 엑셀파일로 저장한 과정이다. <br>
+데이터 정제 및 필요시 형태소 분석은 추가적인 과정이 필요하다.
 
 
 
