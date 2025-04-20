@@ -10,6 +10,8 @@ const PORT = 3000;
 /* nvm use */
 /* nvm install */
 
+/* 서버 실행시 "npm run dev" 명령어 사용 */
+
 
 /* 라이브 서버 관련 코드 (코드 고치고 저장하면 알아서 새로고침) */
 const liveReloadServer = livereload.createServer();
