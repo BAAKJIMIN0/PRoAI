@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PRo-AI</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- 헤더 -->
+  <header id="main-header">
+    <div class="header-content">
+      <h1>PRo-AI</h1>
+    </div>
+  </header>
+
+  <!-- 메인 컨테이너 -->
+  <div class="container">
+    <!-- 왼쪽 영역 -->
+    <div class="left-frame">
+      <h3>정보 입력</h3>
+      <form id="input-form">
+        <label for="inProblem">문제 배경</label>
+        <textarea id="inProblem" placeholder="캠페인 목적 및 추진 이유를 입력하세요" rows="3"></textarea>
+    
+        <label for="inTask">해결 과제</label>
+        <textarea id="inTask" placeholder="해결하고자 하는 문제점을 입력하세요" rows="3"></textarea>
+
+        <label for="inInfo">전달 정보</label>
+        <textarea id="inInfo" placeholder="캠페인을 통해 알려야 할 주요 정보를 입력하세요" rows="3"></textarea>
+
+        <label for="inTarget">주요 타겟</label>
+        <textarea id="inTarget" placeholder="주요 수용자 및 관심 유도 대상을 입력하세요" rows="2"></textarea>
+
+        <label for="inKeyword">핵심 키워드</label>
+        <textarea id="inKeyword" placeholder="중요한 상징 단어들을 입력하세요 (선택)" rows="2"></textarea>
+
+          <button type="button" id="submit-info">제출</button>
+      </form>
+    </div>
+
+    <!-- 오른쪽 영역(채팅) -->
+    <div class="chat-frame">
+      <div id="chat-container"></div>
+      <div id="input-container">
+        <textarea id="user-input" placeholder="메시지를 입력하세요…" rows="1"></textarea>
+        <button id="send-btn">보내기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 푸터 -->
+  <footer id="main-footer">
+    <div class="footer-content">
+      <p>&copy; 작고맵AI</p>
+    </div>
+  </footer>
+
+  <script src="../scripts/input.js"></script>
+  <script src="../scripts/chatbox.js"></script>
+</body>
+</html>
