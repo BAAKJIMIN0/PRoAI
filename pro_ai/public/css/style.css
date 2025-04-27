@@ -25,7 +25,7 @@ body {
     background-color: var(--color-theme);
     color: var(--color-white);
     position: fixed;
-    padding-left: 20px;
+    padding-left: 25px;
     padding-right: 2cqmin;
     top: 0;
     left: 0;
@@ -48,6 +48,12 @@ body {
     color: var(--color-white);
 }
 
+#logo {
+    text-decoration: none;
+    color: var(--color-white);
+    cursor: pointer;
+}
+
 .container {
     width: 100%;
     display: flex;
@@ -55,7 +61,7 @@ body {
     align-items: flex-start;
     gap: 20px;
     height: calc(100vh - 80px - 60px);
-    padding: 20px;
+    padding: 20px 20px 0 20px;
     box-sizing: border-box;
 }
 
@@ -71,6 +77,8 @@ body {
     flex-direction: column;
     padding: 0px 20px;
     box-sizing: border-box;
+    position: relative;
+    overflow-y: auto;
 }
 
 #input-form {
@@ -107,7 +115,12 @@ body {
     border-radius: 10px;
     cursor: pointer;
     transition: var(--background-color) 0.3s ease;
-    margin-top: 10px;
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    width: calc(100% - 40px);
+    box-sizing: border-box;
+    text-align: center;
 }
 
 #input-form button:hover {

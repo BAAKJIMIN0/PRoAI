@@ -15,7 +15,7 @@ submitButton.addEventListener("click", () => {
         keyword: keywordInput.value.trim(),
     };
 
-    // 공백 입력 시시
+    // 공백 입력 확인
     if (!inputData.problem && !inputData.task && !inputData.info || !inputData.target) {
         alert("모든 필수 항목을 입력해주세요.");
         return;
@@ -23,10 +23,22 @@ submitButton.addEventListener("click", () => {
 
     const botMessageElement = document.createElement("div");
     botMessageElement.classList.add("message", "received");
-    botMessageElement.innerText = "";
-    for (const [key, value] of Object.entries(inputData)) {
-        botMessageElement.innerHTML += `${key}: ${value}<br>`;
-    }
+    botMessageElement.innerText = "답변 생성 중...";
     chatContainer.appendChild(botMessageElement);
+
+    setTimeout(() => {
+        let responseMessage = `제출에 대한 응답<br>`;
+        for (const [key, value] of Object.entries(inputData)) {
+            responseMessage += `${key}: ${value}<br>`;
+        }
+        botMessageElement.innerHTML = responseMessage;
+        
+        const chatData = Array.from(chatContainer.children).map((message) => ({
+            text: message.innerText,
+            className: message.className,
+        }));
+        localStorage.setItem("chatData", JSON.stringify(chatData));
+
+    }, 500);
 
 });
