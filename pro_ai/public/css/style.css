@@ -224,6 +224,53 @@ body {
     padding: 0px 10px;
 }
 
+/* 봇 메시지 */
+.received {
+    align-self: flex-start;
+    color: #000000;
+    border-radius: 15px;
+    font-size: 14px;
+    line-height: 1.6;
+    word-wrap: break-word;
+    box-sizing: border-box;
+    padding: 0px 10px;
+}
+
+/* 봇 메시지 버튼 컨테이너 */
+.chat-button-container {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-start;
+    gap: 5px;
+}
+
+/* 봇 메시지 버튼 */
+.chat-button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border);
+}
+
+.chat-button:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+}
+
+.copy:active {
+    background-color: #8bbfe9;
+}
+
+.liked {
+    background-color: #8bbfe9;
+}
+
+.sad-liked {
+    background-color: #8bbfe9;
+}
+
 /* 푸터 */
 #main-footer {
     width: 100%;
