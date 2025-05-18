@@ -96,9 +96,25 @@ userInput.addEventListener("input", () => {
     userInput.style.height = userInput.scrollHeight + "px";
 });
 
+document.querySelectorAll('.theme-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const isSelected = this.classList.contains('selected');
+    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('selected'));
+    if (!isSelected) {
+      this.classList.add('selected');
+      selectedTheme = this.textContent;
+      selectedThemeDiv.textContent = selectedTheme;
+    } else {
+      selectedTheme = "";
+      selectedThemeDiv.textContent = "기본";
+    }
+  });
+});
+
 // 제출 버튼 클릭
 submitButton.addEventListener("click", () => {
     const inputData = {
+        theme: selectedTheme,
         problem: problemInput.value.trim(),
         task: taskInput.value.trim(),
         info: infoInput.value.trim(),

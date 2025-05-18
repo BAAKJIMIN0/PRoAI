@@ -81,6 +81,27 @@ body {
     overflow-y: auto;
 }
 
+.theme-btn-group {
+  display: flex;
+  gap: 0.5em;
+  margin-bottom: 1em;
+}
+.theme-btn {
+  flex: 1;
+  min-width: 0;
+  background: #e3e8f0;
+  border: none;
+  border-radius: 1.5em;
+  padding: 0.4em 1em;
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.theme-btn:hover, .theme-btn.selected {
+  background: #196de3;
+  color: #fff;
+}
+
 #input-form {
     display: flex;
     flex-direction: column;
