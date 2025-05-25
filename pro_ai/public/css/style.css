@@ -243,18 +243,24 @@ body {
     word-wrap: break-word;
     box-sizing: border-box;
     padding: 0px 10px;
+    display: flex;
+    flex-direction: column;
 }
 
-/* 봇 메시지 */
-.received {
-    align-self: flex-start;
-    color: #000000;
-    border-radius: 15px;
-    font-size: 14px;
-    line-height: 1.6;
-    word-wrap: break-word;
-    box-sizing: border-box;
-    padding: 0px 10px;
+/* 복사 버튼 */
+.copy-button {
+    align-self: flex-end;
+    padding: 4px 4px;
+    font-size: 0.9em;
+    background-color: var(--color-white);
+    border: 1px dashed #888;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.copy-button:hover {
+    background-color: #eeeeee;
 }
 
 /* 봇 메시지 버튼 컨테이너 */
