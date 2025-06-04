@@ -18,20 +18,23 @@ def create_prompt(query):
     # 질문과 가장 관련있는 본문 3개를 가져옴
     result = query_vectordb(query, use_retriever=True)
     print(result[0].page_content)
-    print(result[1].page_content)
-    print(result[2].page_content)
+    #print(result[1].page_content)
+    #print(result[2].page_content)
     
     system_message = f"""
         ################################################
         DB에 저장된 문서와 관련된 답변 3개
         Documents:
         doc1: """ + result[0].page_content + """
-        doc2: """ + result[1].page_content + """
-        doc3: """ + result[2].page_content + """
         
         ################################################
         
     """
+    
+    '''
+    doc2: """ + result[1].page_content + """
+        doc3: """ + result[2].page_content + """
+        '''
 
     user_content = f"""
         User question: "{str(query)}". 
@@ -74,11 +77,14 @@ def query_vectordb(query: str, use_retriever: bool = False):
         # idx를 기준으로 필터링
         idx_list = [doc.metadata["idx"] for doc in top_docs]
         print(f"\nidx_list: {idx_list}\n")
-        retriever = vectordb_A.as_retriever(
+        all_docs = vectordb_A.similarity_search(query, k=5)  # 충분히 가져오기
+        top_docs = [doc for doc in all_docs if doc.metadata.get("idx") in idx_list]
+        
+        '''retriever = vectordb_A.as_retriever(
             search_kwargs={"k": 3},
             filter={"idx":{"$in":idx_list}}
         )
-        top_docs = retriever.get_relevant_documents(query)
+        top_docs = retriever.get_relevant_documents(query)'''
         
     else:
         print("\nuse similarity search\n")
@@ -108,7 +114,7 @@ while True:
 
     # GPT 출력
     completion = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model="ft:gpt-3.5-turbo-0125:personal::BXqc5T21", # ft:gpt-3.5-turbo-0125:personal::BWh2RT51 언어유희 ft:gpt-3.5-turbo-0125:personal::BXqc5T21 질문형형
         messages=messages,
         temperature=1.0,    # 기존 0.4
         max_tokens=500
