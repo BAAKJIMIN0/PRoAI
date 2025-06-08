@@ -1,0 +1,2 @@
+
+#CHROMA_COLLECTION_NAME = "RAG_test"
