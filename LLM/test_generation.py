@@ -1,3 +1,4 @@
+
 import os,sys
 from dotenv import load_dotenv
 import openai
@@ -38,6 +39,25 @@ def create_prompt(query: dict):
     ################################################
     """
 
+    # user_content = f"""
+    #     당신은 광고 및 마케팅 전략 전문가입니다.
+
+    #     다음은 문제정의, 타겟, 솔루션, 트렌드 분석을 바탕으로 추출된 관련 문서들입니다.
+    #     이 문서를 기반으로 아래 질문에 대해 다음과 같은 방식으로 응답해 주세요:
+
+    #     1. 문서 내용을 적극적으로 인용하여 질문에 답변합니다.
+    #     2. 문서에 명확한 내용이 없다면, 그 사실을 명확히 밝히고 상식적 기반으로 보완 설명합니다.
+    #     3. 응답은 반드시 한국어로 작성합니다.
+    #     4. 마지막에 '커뮤니케이션 콘셉트 문구'를 생성합니다. (문서 기반)
+    #     5. 총 3가지 형식으로 각각 다른 스타일로 변형하여 제시하세요.
+    #     - ✅ **형식 1**: 핵심 요약형 슬로건 (10자 내외)
+    #     - ✅ **형식 2**: 광고 카피형 (1~2문장, 감성 강조)
+    #     - ✅ **형식 3**: 전략적 설명형 (2~4문장, 논리 기반)
+
+    #     💡 사용자 질문:
+    #     \"\"\"{query}\"\"\"
+    #     """
+    
     user_content = f"""
         User question: "{str(query)}". 
         Answer the question based on the DB-RAG documents above.
@@ -48,7 +68,6 @@ def create_prompt(query: dict):
         Finally, refer to the document to create the most appropriate Comunication concept phrase.
         Give at least three different variations of the answer in different formats.
     """
-
     messages = [
         {"role": "system", "content": system_message},
         {"role": "user", "content": user_content},
@@ -103,20 +122,16 @@ user_content = []
 
 while True:
     try: 
-        print("문제 정의: ", end="")
-        problem = sys.stdin.read()
+        problem = input("문제 정의: ").strip()
         user_content.append(problem.strip())
 
-        print("\n타겟 설정: ", end="")
-        client = sys.stdin.read()
+        client = input("타겟 설정: ").strip()
         user_content.append(client.strip())
 
-        print("\n니즈 파악: ", end="")
-        needs = sys.stdin.read()
+        needs = input("니즈 파악: ").strip()
         user_content.append(needs.strip())
 
-        print("\n트렌드 분석: ", end="")
-        trend = sys.stdin.read()
+        trend = input("트렌드 분석: ").strip()
         user_content.append(trend.strip())
 
     except (KeyboardInterrupt, EOFError):
