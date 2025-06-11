@@ -2,8 +2,8 @@
 import os,sys
 from dotenv import load_dotenv
 import openai
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.vectorstores import Chroma
+from langchain_community.embeddings import OpenAIEmbeddings
+from langchain_community.vectorstores import Chroma
 
 load_dotenv()
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
@@ -58,16 +58,58 @@ def create_prompt(query: dict):
     #     \"\"\"{query}\"\"\"
     #     """
     
+    # user_content = f"""
+    #     User question: "{str(query)}". 
+    #     Answer the question based on the DB-RAG documents above.
+    #     If it is in the document, actively refer to the document and create an answer. 
+    #     If it is not in the document, inform the user that it is not in the document and create an appropriate answer.
+    #     Finally, refer to the document to create the most appropriate Comunication concept phrase.
+    #     Answer in Korean.
+    #     Give at least three different variations concepts of the answer in different formats.
+    # """
+
+    # user_content = f"""
+    # User question: "{str(query)}". 
+    # Please answer based on the DB-RAG documents provided above.
+
+    # If the document clearly includes relevant content, use it in your answer.  
+    # If not, infer a possible answer by combining related insights or trends from the documents.  
+
+    # Respond in Korean. At the end, generate 3 creative variations of a communication concept based on the content.
+    # """
+    print("질문문자열:",str(query))
     user_content = f"""
-        User question: "{str(query)}". 
-        Answer the question based on the DB-RAG documents above.
-        If it is in the document, actively refer to the document and create an answer. 
-        If it is not in the document, inform the user that it is not in the document and create an appropriate answer.
-        
-        Answer in Korean.
-        Finally, refer to the document to create the most appropriate Comunication concept phrase.
-        Give at least three different variations of the answer in different formats.
-    """
+        당신은 광고 및 커뮤니케이션 전략에 정통한 전문가입니다.
+
+        아래는 문제 정의, 타겟, 솔루션, 트렌드 분석을 기반으로 검색된 문서들입니다.
+        이 문서를 적극적으로 인용하거나, 명시적인 내용이 없을 경우 문맥 기반의 논리적 추론을 통해 사용자 질문에 답변해 주세요.
+        답변은 반드시 한국어로 작성하세요.
+
+        --- 사용자 질문 ---
+        \"\"\"{str(query)}\"\"\"
+
+        --- 요구사항 ---
+        background에 해당되는 문제점을 파악하고, target 연령대에 맞는 컨셉으로, solution에 해당되는 내용에 맞게,
+        assistance의 내용을 참고하여, 다음 기준에 따라 **3가지 커뮤니케이션 콘셉트 스타일**을 제안하세요:
+
+        1. 다양한 스타일(문제해결형, 트렌드반영형, 참여유도형, 감성추구형, 관심주목형) 중 **문제에 가장 적합한 3가지**를 선정하세요.
+        2. 각 스타일은 서로 명확히 다른 접근을 취해야 하며, **GPT가 문맥상 가장 효과적인 조합**을 판단하여 선택해야 합니다.
+        3. 각 콘셉트는 다음의 3가지 요소를 포함해야 합니다:
+            - ✅ 콘셉트 유형명 (자유롭게 정하되 명확할 것)
+            - ✅ 해당 스타일로 작성한 콘셉트 문구 (반드시 10~40자 사이의 간결한 문장으로 작성)
+            - ✅ 간단한 이유 또는 목적 설명 (이 스타일이 문제 정의와 타겟에 어떻게 부합하며, 어떤 메시지를 전달하고자 하는지 간결히 설명해 주세요.)
+
+        예시 형식:
+        1️⃣ [유형명]  
+        문구: "..."  
+        설명: ...
+
+        ---
+        응답 형식은 위 예시와 유사하게, 콘셉트 3가지를 우선순위 순으로 제시하세요.
+        """
+
+
+
     messages = [
         {"role": "system", "content": system_message},
         {"role": "user", "content": user_content},
@@ -77,41 +119,29 @@ def create_prompt(query: dict):
 def query_vectordb(query: str, purpose: str, use_retriever: bool = False):
     from pprint import pprint
 
-    # vecotordb 로드
-    vectordb_A = Chroma(
+    # 벡터DB 단일화
+    vectordb = Chroma(
         persist_directory=CHROMA_PERSIST_DIR,
         embedding_function=OpenAIEmbeddings(),
-        collection_name="RAG_A",
+        collection_name="RAG_B",  # 기존 A로 통일
     )
-    
-    vectordb_B = Chroma(
-        persist_directory=CHROMA_PERSIST_DIR,
-        embedding_function=OpenAIEmbeddings(),
-        collection_name="RAG_B",
-    )
-
-    # 벡터 DB에서 질문과 가장 관련있는 본문 3개를 가져옴
+    docs = vectordb.similarity_search("대학생", k=1)
+    print(docs[0].metadata)
     if use_retriever:
-        print("\nuse retriever\n")
-        retriever = vectordb_B.as_retriever(search_kwargs={"k": 3}, filter={"section":{purpose}})
-        top_docs = retriever.get_relevant_documents(query)
-        
-        # idx를 기준으로 필터링
-        idx_list = [doc.metadata["idx"] for doc in top_docs]
-        print(f"\nidx_list: {idx_list}\n")
-        all_docs = vectordb_A.similarity_search(query, k=5)  # 충분히 가져오기
-        top_docs = [doc for doc in all_docs if doc.metadata.get("idx") in idx_list]
-        
-        '''retriever = vectordb_A.as_retriever(
+        print("\n[retriever 사용] section 필터:", purpose)
+
+        # section 필터 기반으로 관련 문서 검색
+        retriever = vectordb.as_retriever(
             search_kwargs={"k": 3},
-            filter={"idx":{"$in":idx_list}}
+            filter={"section": purpose}
         )
-        top_docs = retriever.get_relevant_documents(query)'''
-        
+        top_docs = retriever.get_relevant_documents(query)
+
     else:
-        print("\nuse similarity search\n")
-        
-        top_docs = vectordb_A.similarity_search(query, k=3)
+        print("\n[similarity_search 사용]")
+
+        # 단순 벡터 유사도 기반 검색
+        top_docs = vectordb.similarity_search(query, k=3)
 
     pprint(top_docs)
     return top_docs
