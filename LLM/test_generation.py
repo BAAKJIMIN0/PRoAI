@@ -191,7 +191,7 @@ while True:
 
     # GPT 출력
     completion = openai.ChatCompletion.create(
-        model="ft:gpt-3.5-turbo-0125:personal::BWh2RT51", # ft:gpt-3.5-turbo-0125:personal::BWh2RT51 언어유희 ft:gpt-3.5-turbo-0125:personal::BXqc5T21 질문형형
+        model="ft:gpt-3.5-turbo-0125:personal::BhBKYQy5", # ft:gpt-3.5-turbo-0125:personal::BWh2RT51 언어유희 ft:gpt-3.5-turbo-0125:personal::BXqc5T21 질문형 ft:gpt-3.5-turbo-0125:personal::BhBKYQy5 둘다다
         messages=messages,
         temperature=1.0,    # 기존 0.4
         max_tokens=1000

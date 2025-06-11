@@ -22,7 +22,7 @@ print(f"학습 파일 업로드 완료! 파일 ID: {train_file.id}")
 # 파인튜닝 작업 생성
 job = client.fine_tuning.jobs.create(
     training_file=train_file.id,
-    model="gpt-3.5-turbo"
+    model="ft:gpt-3.5-turbo-0125:personal::BXqc5T21"
 )
 job_id = job.id
 print(f"파인튜닝 시작! 작업 ID: {job_id}")
