@@ -10,6 +10,27 @@ const targetInput = document.getElementById("inTarget");
 const keywordInput = document.getElementById("inKeyword");
 selectedTheme = "기본"
 
+let loadingInterval;
+function showLoadingMessage() {
+    const loadingMessageElement = document.createElement("div");
+    loadingMessageElement.classList.add("message", "received");
+
+    const textElement = document.createElement("div");
+    textElement.classList.add("receivedText");
+    loadingMessageElement.appendChild(textElement);
+
+    chatContainer.appendChild(loadingMessageElement);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    let dotCount = 0;
+    loadingInterval = setInterval(() => {
+        dotCount = (dotCount + 1) % 4; // 0, 1, 2, 3
+        textElement.innerText = "응답 대기 중" + ".".repeat(dotCount);
+    }, 500);
+
+    return loadingMessageElement;
+}
+
 // 채팅 저장
 function saveChatToLocalStorage() {
     const chatData = Array.from(chatContainer.children).map((message) => {
@@ -174,6 +195,8 @@ submitButton.addEventListener("click", () => {
         return;
     }
 
+    const loadingMessageElement = showLoadingMessage();
+
     fetch('/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -181,6 +204,8 @@ submitButton.addEventListener("click", () => {
     })
     .then(response => response.json())
     .then(data => {
+        clearInterval(loadingInterval);
+        chatContainer.removeChild(loadingMessageElement);
         simulateTyping(data.result, 20);
     })
     .catch(err => {

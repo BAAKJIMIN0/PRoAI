@@ -44,14 +44,36 @@ def create_prompt(query: dict):
         """
 
     user_content = f"""
-        User question: "{str(query)}". 
-        Answer the question based on the DB-RAG documents above.
-        If it is in the document, actively refer to the document and create an answer. 
-        If it is not in the document, inform the user that it is not in the document and create an appropriate answer.
-        Answer in Korean.
-        Finally, refer to the document to create the most appropriate Comunication concept phrase.
-        Give at least three different variations of the answer in different formats.
-    """
+        당신은 광고 및 커뮤니케이션 전략에 정통한 전문가입니다.
+
+        참조된 'docs_test' 는 문제 정의, 타겟, 솔루션, 핵심 키워드를를 기반으로 검색된 문서들입니다.
+        참조된 문서의 'concept' 부분을 인용하여 창의적인 답변을 추론해주세요.
+        명시적인 내용이 없을 경우 문맥 기반의 논리적 추론을 통해 사용자 질문에 답변해 주세요.
+        답변은 한국어로 작성하되, 언어유희 경우 영어도 활용해 주세요.
+
+        --- 사용자 질문 ---
+        \"\"\"{str(query)}\"\"\"
+
+        --- 요구사항 ---
+        background에 해당되는 문제점을 파악하고, target 연령대에 맞는 컨셉으로, solution에 해당되는 내용에 맞게,
+        assistance의 내용을 참고하여, 다음 기준에 따라 **3가지 커뮤니케이션 콘셉트 스타일**을 제안하세요:
+
+        1. 다양한 스타일의 유형(문제해결형, 트렌드반영형, 참여유도형, 감성추구형, 관심주목형) 중 **문제에 가장 적합한 3가지**를 선정하세요.(!중요! 다른 유형 사용금지)
+        2. 각 스타일은 서로 명확히 다른 접근을 취해야 하며, **GPT가 문맥상 가장 효과적인 조합**을 판단하여 선택해야 합니다.
+        3. 각 콘셉트는 다음의 3가지 요소를 포함해야 합니다:
+            - ✅ 콘셉트 유형명 (1. 문제해결형, 2. 트렌드반영형, 3. 참여유도형, 4 . 감성추구형, 5. 관심주목형 중 하나)
+            - ✅ 해당 스타일로 작성한 콘셉트 문구 (반드시 10~40자 사이의 간결한 문장으로 작성)
+            - ✅ 간단한 이유 또는 목적 설명 (이 스타일이 문제 정의와 타겟에 어떻게 부합하며, 어떤 메시지를 전달하고자 하는지 간결히 설명해 주세요.)
+        4. 콘셉트는 최대한 인간친화적으로 자연스러운 답변을 만들어주세요.
+
+        예시 형식:
+        1️⃣ [유형명]  
+        문구: "..."  
+        설명: ...   (설명은 도출된 컨셉을 구체적으로 작성)
+
+        ---
+        응답 형식은 위 예시와 유사하게, 콘셉트 3가지를 우선순위 순으로 제시하세요.
+        """
 
     messages = [
         {"role": "system", "content": system_message},
@@ -126,7 +148,7 @@ if __name__ == "__main__":
 
     # GPT 출력
     completion = openai.ChatCompletion.create(
-        model="ft:gpt-3.5-turbo-0125:personal::BWh2RT51",
+        model="ft:gpt-3.5-turbo-0125:personal::BXqc5T21",
         messages=messages,
         temperature=1.0,
         max_tokens=1000
