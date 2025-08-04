@@ -22,7 +22,7 @@ CHROMA_PERSIST_DIR = os.path.join(CUR_DIR, 'db/test')
 CHROMA_COLLECTION_NAME = "RAG_A"
 
 # MongoDB에서 데이터 불러오기
-mongo_client = MongoClient("mongodb://smim:1q2w3e4r@ubuntu-server.tplinkdns.com:27017")
+mongo_client = MongoClient("mongodb://smim:1q2w3e4r@proai-ubuntu.ddns.net:27017")
 db = mongo_client["proai"]
 collection = db["proai"]
 mongo_data = list(collection.find({}))  # 모든 document 가져오기
