@@ -35,10 +35,13 @@ app.get('/', (req, res) => {
 app.post('/generate', (req, res) => {
     const inputData = req.body;
 
-    const py = spawn('python', [
-        path.join(__dirname, 'public', 'LLM', 'test_generation.py'),
+    const py = spawn(
+    path.join(__dirname, "public", "LLM", "venv", "bin", "python3"), // ✅ venv 안 python 지정
+    [
+        path.join(__dirname, "public", "LLM", "test_generation.py"),
         JSON.stringify(inputData)
-    ]);
+    ]
+);
 
     let result = '';
     let error = '';

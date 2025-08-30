@@ -2,15 +2,16 @@ import sys
 import json
 import os,sys
 from dotenv import load_dotenv
-import openai
-from langchain_community.embeddings import OpenAIEmbeddings
-from langchain_community.vectorstores import Chroma
+from openai import OpenAI
+from langchain_openai import OpenAIEmbeddings
+from langchain_chroma import Chroma
 
 load_dotenv()
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 if OPENAI_API_KEY is None:
     raise ValueError("환경변수 OPENAI_API_KEY가 설정되어 있지 않습니다.")
-openai.api_key = OPENAI_API_KEY
+
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 CUR_DIR = os.path.dirname(os.path.abspath(__file__))
 CHROMA_PERSIST_DIR = os.path.join(CUR_DIR, 'db/test')
@@ -98,7 +99,7 @@ def query_vectordb(query: str, purpose: str, use_retriever: bool = False):
     # 벡터 DB에서 질문과 가장 관련있는 본문 3개를 가져옴
     if use_retriever:
         retriever = vectordb_B.as_retriever(search_kwargs={"k": 3}, filter={"section":{purpose}})
-        top_docs = retriever.get_relevant_documents(query)
+        top_docs = retriever.invoke(query)
         
         # idx를 기준으로 필터링
         idx_list = [doc.metadata["idx"] for doc in top_docs]
@@ -127,6 +128,10 @@ def generate_answer(theme, problem, task, info, target, keyword):
     return f"테마: {theme} | 문제: {problem} | 작업: {task} | 정보: {info} | 대상: {target} | 키워드: {keyword}"
 
 if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: python test_generation.py '<json_string>'")
+        sys.exit(1)
+
     input_json = sys.argv[1]
     data = json.loads(input_json)
 
@@ -147,12 +152,12 @@ if __name__ == "__main__":
     )
 
     # GPT 출력
-    completion = openai.ChatCompletion.create(
+    completion = client.chat.completions.create(
         model="ft:gpt-3.5-turbo-0125:personal::BXqc5T21",
         messages=messages,
         temperature=1.0,
         max_tokens=1000
     )
-    assistant_content = completion.choices[0].message["content"].strip()
+    assistant_content = completion.choices[0].message.content.strip()
 
     print(assistant_content)
