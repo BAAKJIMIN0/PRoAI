@@ -67,10 +67,13 @@ app.post('/generate', (req, res) => {
 app.post('/chatAI', (req, res) => {
     const inputData = req.body;
 
-    const py = spawn('python', [
-        path.join(__dirname, 'public', 'js', 'chatAI.py'),
-        JSON.stringify(inputData)
-    ]);
+    const py = spawn(
+        path.join(__dirname, "public", "LLM", "venv", "bin", "python3"), // ✅ venv 안 python 지정
+        [
+            path.join(__dirname, 'public', 'js', 'chatAI.py'),
+            JSON.stringify(inputData)
+        ]
+    );
 
     let result = '';
     let error = '';
