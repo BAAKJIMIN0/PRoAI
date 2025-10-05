@@ -127,25 +127,32 @@ body {
     line-height: 1.5;
 }
 
-#input-form button {
-    padding: 10px 20px;
-    font-size: 14px;
-    border: none;
-    background-color: var(--color-theme);
-    color: var(--color-white);
-    border-radius: 10px;
-    cursor: pointer;
-    transition: var(--background-color) 0.3s ease;
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
-    width: calc(100% - 40px);
-    box-sizing: border-box;
-    text-align: center;
+.submit-area {
+  width: 100%;
+  padding: 30px 0 10px 0;
+  display: flex;
+  justify-content: center;
+  background: transparent;
+  position: relative;
 }
 
-#input-form button:hover {
-    background-color: var(--color-button-hover);
+#submit-info {
+  padding: 12px 32px;
+  font-size: 16px;
+  border: none;
+  background-color: var(--color-theme);
+  color: var(--color-white);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+  position: static;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+#submitBtn:hover {
+  background-color: var(--color-button-hover);
 }
 
 /* 오른쪽 영역(채팅) */
@@ -216,7 +223,7 @@ body {
     width: 100%;
     border-radius: 15px;
     word-wrap: break-word;
-    font-size: 14px;
+    font-size: 20px;
     white-space: pre-wrap;
     box-sizing: border-box;
 }
@@ -227,7 +234,7 @@ body {
     background-color: var(--color-background);
     color: #000000;
     border-radius: 15px;
-    font-size: 14px;
+    font-size: 20px;
     line-height: 1.5;
     word-wrap: break-word;
     padding: 10px 10px;
@@ -238,7 +245,7 @@ body {
     align-self: flex-start;
     color: #000000;
     border-radius: 15px;
-    font-size: 14px;
+    font-size: 20px;
     line-height: 1.6;
     word-wrap: break-word;
     box-sizing: border-box;
