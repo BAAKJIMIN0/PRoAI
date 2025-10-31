@@ -12,11 +12,9 @@ agent = Agent(
     """
         당신은 마케팅 문구 분석 전문가입니다. 전달된 데이터를 제시되는 기준으로 평가해주세요. 
         
-        # 사용자 질문 
-        - {rag_output['query']}
-        # RAG 데이터
-        - {rag_output['rag']}
-        # 생성된 답변
+        [입력 데이터]: 
+        - {rag_output}
+        [생성된 답변]:
         - {transform_output}
 
         다음 기준으로 데이터 품질을 evaluation해주세요 (각 항목 0-10점):
