@@ -56,7 +56,7 @@ root_agent = LlmAgent(
     ),
     generate_content_config=types.GenerateContentConfig(
         temperature=0.2, # More deterministic output
-        max_output_tokens=15000,
+        max_output_tokens=30000,
         safety_settings=[
             types.SafetySetting(
                 category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
@@ -141,7 +141,7 @@ async def run_conversation(query):
 if __name__ == "__main__":
     asyncio.run(setup_and_run(
         query='''
-            '표현 유형' : '질문형'
+            '표현 유형' : '언어유희형'
             'background': '지역 특산물은 품질이 좋아도 MZ세대 인지도가 낮음'
             'solution': '전통적인 이미지를 현대적으로 재해석'
             'target': '20~30대 로컬 소비 관심층, 여행을 즐기는 젊은 세대'

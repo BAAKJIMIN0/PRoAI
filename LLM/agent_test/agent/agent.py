@@ -1,64 +1,49 @@
+import os
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+import warnings
+warnings.filterwarnings("ignore")   # Ignore all warnings
+import logging
+logging.basicConfig(level=logging.ERROR)
 from google.adk.tools.agent_tool import AgentTool
-from google.adk.tools import google_search
-from google import genai
-from google.adk.agents import LoopAgent, LlmAgent, SequentialAgent, Agent
-from google.adk.runners import InMemoryRunner
-from google.adk.tools.tool_context import ToolContext
-#from google.adk.events import EventActions
-from typing import Dict
+from google.adk.agents import  LlmAgent #,LoopAgent, SequentialAgent, Agent
+from typing import List, Dict
 import asyncio
 from google.adk.sessions import InMemorySessionService
 from google.adk.runners import Runner
 from google.genai import types
-from pydantic import BaseModel, Field
-from sub_agent import pr_pipeline_agent
-#from .config import config
-import os
+from sub_agent import processor, pr_pipeline_agent, search_agent
+from sub_agent.processor import processor
 from dotenv import load_dotenv
-
-import warnings
-# Ignore all warnings
-warnings.filterwarnings("ignore")
-
-import logging
-logging.basicConfig(level=logging.ERROR)
-
-# thinking_config = ThinkingConfig(
-#     include_thoughts=True,   # Ask the model to include its thoughts in the response
-#     thinking_budget=256      # Limit the 'thinking' to 256 tokens (adjust as needed)
-# )
-# print("ThinkingConfig:", thinking_config)
-
-# # Step 2: Instantiate BuiltInPlanner
-# planner = BuiltInPlanner(
-#     thinking_config=thinking_config
-# )
+# from pydantic import BaseModel, Field
+# from google.adk.runners import InMemoryRunner
+# from google.adk.tools.tool_context import ToolContext
 
 load_dotenv()
 if os.getenv("GOOGLE_API_KEY"):
     api_key = os.getenv("GOOGLE_API_KEY")
     
 os.environ["GOOGLE_API_KEY"] = api_key
-os.environ["GENAI_API_KEY"] = api_key 
 
 print("GOOGLE_API_KEY:", os.getenv("GOOGLE_API_KEY"))
 
-class ConceptInput(BaseModel):
-    """광고/커뮤니케이션 콘셉트 도출에 필요한 입력 데이터 구조입니다."""
-    background: str = Field(description="문제 배경에 대한 상세 텍스트입니다.")
-    target: str = Field(description="주 타겟에 대한 상세 텍스트입니다.")
-    solution: str = Field(description="해결 과제에 대한 상세 텍스트입니다.")
-    content: str = Field(description="주요 내용에 대한 상세 텍스트입니다.")
-    assistance: str = Field(description="추가 분석 및 키워드에 대한 상세 텍스트입니다.")
+# class ConceptInput(BaseModel):
+#     """광고/커뮤니케이션 콘셉트 도출에 필요한 입력 데이터 구조입니다."""
+#     background: str = Field(description="문제 배경에 대한 상세 텍스트입니다.")
+#     target: str = Field(description="주 타겟에 대한 상세 텍스트입니다.")
+#     solution: str = Field(description="해결 과제에 대한 상세 텍스트입니다.")
+#     content: str = Field(description="주요 내용에 대한 상세 텍스트입니다.")
+#     assistance: str = Field(description="추가 분석 및 키워드에 대한 상세 텍스트입니다.")
 
+# def execute_pipeline_fn(query: ConceptInput):
+#     """
+#     pr_pipeline_agent를 실행하고 결과를 반환하는 래퍼 함수입니다.
+#     이 함수는 AgentTool 내부에서 사용되며, 입력은 Pydantic 모델로 변환됩니다.
+#     """
+#     return pr_pipeline_agent.run(ConceptInput) 
 
-def execute_pipeline(query: ConceptInput):
-    """
-    pr_pipeline_agent를 실행하고 결과를 반환하는 래퍼 함수입니다.
-    이 함수는 AgentTool 내부에서 사용되며, 입력은 Pydantic 모델로 변환됩니다.
-    """
-    return pr_pipeline_agent.run(ConceptInput) 
-
+def get_rag(query: str, purpose: str)->List[Dict]:
+    result = processor.query_vectordb(query, purpose=purpose, k=1)
+    return result
 
 root_agent = LlmAgent(
     name="prompt_agent",
@@ -70,28 +55,30 @@ root_agent = LlmAgent(
         """
         당신은 사용자 질문에 도구와 에이전트를 사용하여 답변하는 유능한 에이전트입니다.
         다음의 두가지 경우에 대해 각각 다른 워크플로우를 따르세요:
-        1. 사용자의 입력(query)이 광고/커뮤니케이션 콘셉트 도출에 필요한 정보(문제 배경, 타겟, 해결 과제, 주요 내용, 추가 분석)를 포함하고 있지 않은 경우:
-        사용자의 입력(query)이 광고/커뮤니케이션 콘셉트 도출에 필요한 **문제 배경(background), 타겟(target), 해결 과제(solution), 주요 내용(content), 추가 분석(assistance) 등의 정보**를 포함하고 있다면, 
-        이 정보들을 추출하여 아래의 **정의된 dictionary 형식**으로 재구성한 후, 
-        **반드시** `execute_pipeline` 도구를 사용하여 이 dictionary를 전달해야 합니다.
-
-        **Dictionary 형식:**
-        {"rag" : Tool(execute_pipeline)로 가져온 데이터 결과,
-        "query":
-            {
-                "background": 사용자 입력에서 추출된 문제 배경 텍스트,
-                "target": 사용자 입력에서 추출된 주 타겟 텍스트,
-                "solution": 사용자 입력에서 추출된 해결 과제 텍스트,
-                "content": 사용자 입력에서 추출된 주요 내용 텍스트,
-                "assistance": 사용자 입력에서 추출된 추가 분석/키워드 텍스트
-            }
+        
+        1. 광고/커뮤니케이션 콘셉트 도출에 필요한 정보를 포함하는 경우:
+        사용자의 입력에서 다음 5가지 정보(**문제 배경, 타겟, 해결 과제, 주요 내용, 추가 분석**)를 추출하세요.
+        추출한 정보를 아래의 **Dictionary 형식**으로 구성한 후, 이 Dictionary를 **JSON 문자열로 변환**하세요.
+        
+        **Dictionary 형식 (JSON 문자열로 변환되어야 함):**
+        {
+            "background": 추출된 문제 배경 텍스트,
+            "target": 추출된 주 타겟 텍스트,
+            "solution": 추출된 해결 과제 텍스트,
+            "content": 추출된 주요 내용 텍스트,
+            "assistance": 추출된 추가 분석/키워드 텍스트
         }
-        최종적으로 `execute_pipeline`가 생성한 결과물을 사용자에게 전달하세요.
+        
+        최종적으로 이 **JSON 문자열**을 `pr_pipeline_agent` 도구로 **호출(call)해야 합니다.** 
+
+        
+        2. 사용자의 질문에 단순 사실적 정보 검색이나 대답이 필요한 경우:
+        사용자의 질문에 대해 적절한 도구(예: google_search)를 사용하여 필요한 정보를 검색하고, 그 정보를 바탕으로 답변을 생성하세요.
         """
     ),
     generate_content_config=types.GenerateContentConfig(
         temperature=0.2, # More deterministic output
-        max_output_tokens=250,
+        max_output_tokens=2000,
         safety_settings=[
             types.SafetySetting(
                 category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
@@ -99,10 +86,9 @@ root_agent = LlmAgent(
             )
         ]
     ),
-    # planner=planner, # Assign the planner to the agent
     include_contents='default',
-    output_key='data',
-    tools=[execute_pipeline,]
+    #output_key='query',
+    tools=[AgentTool(agent=pr_pipeline_agent), AgentTool(agent=search_agent)]
 )
 
 APP_NAME = "Research agent"
@@ -177,11 +163,11 @@ async def run_conversation(query):
 if __name__ == "__main__":
     asyncio.run(setup_and_run(
         query='''
-        'background': '자격증·취미교육 시장 포화, 기존 광고 방식은 정보 중심으로 차별성 부족'
-        'solution': '‘변화’와 ‘성과’ 중심으로 메시지 재구성, 광고 클릭 시 명확한 이점 제공'
-        'target': '20~40대 직장인 및 취업 준비생, 실질적인 결과에 민감한 교육 소비자'
-        'content': '무료 교재, 합격 후기 강조, 인플루언서 모델 등장 광고, 동영상·네이티브 이미지 광고 활용'
-        'assistance': '기대효과, 무료혜택, 후기, 인플루언서, 네이티브광 고, “이거 하면 나도 달라질 수 있겠다”, “유명인이 추천하네”, “무료니까 한 번 해볼까?”'
+            'background': '지역 특산물은 품질이 좋아도 MZ세대 인지도가 낮음'
+            'solution': '전통적인 이미지를 현대적으로 재해석'
+            'target': '20~30대 로컬 소비 관심층, 여행을 즐기는 젊은 세대'
+            'content': '지역의 가치를 힙하고 재미있게 소비할 수 있다는 메시지'
+            'assistance': '로컬푸드, 힙한전통, 맛있는여행'
         ''',
         root_agent=root_agent, 
         APP_NAME=APP_NAME, 
