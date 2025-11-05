@@ -9,7 +9,7 @@ const PORT = 3000;
 /* NodeJS 버전 맞추기 */
 /* nvm use */
 /* nvm install */
-
+/* npm install express path http livereload connect-livereload */
 /* 서버 실행시 "npm run dev" 명령어 사용 */
 
 app.use(express.json());
