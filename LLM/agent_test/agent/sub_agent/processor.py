@@ -15,7 +15,7 @@ class RAGDataProcessor:
         embedding_model = HuggingFaceEmbeddings(
             model_name="jhgan/ko-sroberta-multitask"
         )
-        mongo_client = MongoClient("mongodb://localhost:27017/") # mongodb://localhost:27017/ | mongodb://mskim:1q2w3e4r@ubuntu-server.tplinkdns.com:27017
+        mongo_client = MongoClient("mongodb://mskim:1q2w3e4r@ubuntu-server.tplinkdns.com:27017") # mongodb://localhost:27017/ | mongodb://mskim:1q2w3e4r@ubuntu-server.tplinkdns.com:27017
         db = mongo_client["pro"]   # 데이터베이스 이름
         self.mongoDB = db["pro"]     # 컬렉션 이름
 
