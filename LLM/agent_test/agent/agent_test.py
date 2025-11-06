@@ -23,8 +23,6 @@ load_dotenv()
 if os.getenv("GOOGLE_API_KEY"):
     os.environ["GOOGLE_API_KEY"] = os.getenv("GOOGLE_API_KEY")
     
-print("GOOGLE_API_KEY:", os.getenv("GOOGLE_API_KEY"))
-
 root_agent = LlmAgent(
     name="root_agent",
     model="gemini-2.5-flash",      #config.root_agent_model,
@@ -80,7 +78,7 @@ RUNNER = None
 
 async def call_agent_async(query: str, runner, user_id, session_id):
     """에이전트에게 쿼리를 보내고 최종 응답을 출력합니다."""
-    print(f"\n>>> 사용자 쿼리: {query}")
+    #print(f"\n>>> 사용자 쿼리: {query}")
 
     # 사용자의 쿼리를 Content 객체로 만듭니다.
     content = types.Content(role='user', parts=[types.Part(text=query)])
@@ -93,7 +91,7 @@ async def call_agent_async(query: str, runner, user_id, session_id):
     async for event in runner.run_async(user_id=user_id, session_id=session_id, new_message=content):
 
         # Event에서 어떤 작업이 일어나는지 확인
-        print(f"  [Event] author: {event.author}, Type: {type(event).__name__}, Response: {event.is_final_response()}, Content: {event.content}")
+        #print(f"  [Event] author: {event.author}, Type: {type(event).__name__}, Response: {event.is_final_response()}, Content: {event.content}")
 
         if event.is_final_response():
             if event.content and event.content.parts:
@@ -108,7 +106,7 @@ async def call_agent_async(query: str, runner, user_id, session_id):
             # 최종 응답을 찾으면 이벤트 처리를 중단합니다.
             break
 
-    print(f"<<< 에이전트 응답: \n{final_response_text}")
+    print(f"{final_response_text}")
     
 async def setup_and_run(query: str, root_agent, APP_NAME, USER_ID, SESSION_ID):
     """세션을 설정하고 에이전트를 실행하는 비동기 함수"""
@@ -120,14 +118,14 @@ async def setup_and_run(query: str, root_agent, APP_NAME, USER_ID, SESSION_ID):
         user_id=USER_ID,
         session_id=SESSION_ID
     )
-    print(f"Session created: App='{APP_NAME}', User='{USER_ID}', Session='{SESSION_ID}'")
+    #print(f"Session created: App='{APP_NAME}', User='{USER_ID}', Session='{SESSION_ID}'")
 
     RUNNER = Runner(
         agent=root_agent,
         app_name=APP_NAME,
         session_service=session_service
     )
-    print(f"Runner created for agent '{RUNNER.agent.name}'.")
+    #print(f"Runner created for agent '{RUNNER.agent.name}'.")
     
     # 세션과 러너를 설정한 후 대화를 실행
     await call_agent_async(query, 
@@ -150,6 +148,7 @@ if __name__ == "__main__":
 
     # JSON 데이터를 query 문자열로 변환
     query_str = f"""
+    '표현 유형': '{data.get('theme', '')}'
     'background': '{data.get('background', '')}'
     'solution': '{data.get('solution', '')}'
     'target': '{data.get('target', '')}'
